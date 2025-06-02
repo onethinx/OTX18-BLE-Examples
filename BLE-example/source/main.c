@@ -52,7 +52,7 @@ coreConfiguration_t	coreConfig = {
 		.KeysPtr = 			&TTN_OTAAkeys,
 		.DataRate =			DR_AUTO,
 		.Power =			PWR_MAX,
-		.MAXTries = 		100,
+		.MAXTries = 		4,
 		.SubBand_1st =     	EU_SUB_BANDS_DEFAULT,
 		.SubBand_2nd =     	EU_SUB_BANDS_DEFAULT
 	},
@@ -71,8 +71,8 @@ coreConfiguration_t	coreConfig = {
 	{
 		.Idle =
 		{
-			.Mode = 		M0_DeepSleep,
-			.BleEcoON =		false,
+			.Mode = 		M0_Active,	// Must be Active for BLE operation
+			.BleEcoON =		true,		// Must be ON for BLE operation
 			.DebugON =		true,
 		}
 	}
@@ -88,10 +88,17 @@ sleepConfig_t sleepConfig =
 	.wakeUpTime = wakeUpDelay(0, 0, 0, 30), // day, hour, minute, second
 };
 
+typedef enum
+{
+	lorawan_idle = 0,
+	lorawan_join = 0x10,
+    lorawan_send = 0x11,
+} LoRaStatus_e;
 
 /* OnethinxCore uses the following structures and variables, which can be defined globally */
 coreStatus_t 	coreStatus;
 coreInfo_t 		coreInfo;
+LoRaStatus_e	LoRaStatus;
 
 uint8_t RXbuffer[64];
 uint8_t TXbuffer[64];
@@ -106,17 +113,17 @@ uint8_t TXbuffer[64];
 *******************************************************************************/
 void DeviceSleep(sleepConfig_t * sleepConfig)
 {
-    uint32_t RX_HSIOM = Cy_GPIO_GetHSIOM(UART_rx_PORT, UART_rx_NUM);
-    uint32_t TX_HSIOM = Cy_GPIO_GetHSIOM(UART_tx_PORT, UART_tx_NUM);
-    Cy_GPIO_Pin_FastInit(UART_rx_PORT, UART_rx_NUM, CY_GPIO_DM_HIGHZ, 0, HSIOM_SEL_GPIO);
-	Cy_GPIO_Pin_FastInit(UART_tx_PORT, UART_tx_NUM, CY_GPIO_DM_HIGHZ, 0, HSIOM_SEL_GPIO);
+    uint32_t RX_HSIOM = Cy_GPIO_GetHSIOM(RX_IN_PORT, RX_IN_NUM);
+    uint32_t TX_HSIOM = Cy_GPIO_GetHSIOM(TX_OUT_PORT, TX_OUT_NUM);
+    Cy_GPIO_Pin_FastInit(RX_IN_PORT, RX_IN_NUM, CY_GPIO_DM_HIGHZ, 0, HSIOM_SEL_GPIO);
+	Cy_GPIO_Pin_FastInit(TX_OUT_PORT, TX_OUT_NUM, CY_GPIO_DM_HIGHZ, 0, HSIOM_SEL_GPIO);
     Cy_GPIO_Write(LED_B_PORT, LED_B_NUM, 0);
     Cy_GPIO_Write(LED_R_PORT, LED_R_NUM, 0);
     Cy_SCB_UART_Disable(UART_HW, &UART_context);
     LoRaWAN_Sleep(sleepConfig);
     UART_Start();
-    Cy_GPIO_Pin_FastInit(UART_rx_PORT, UART_rx_NUM, CY_GPIO_DM_HIGHZ, 1, RX_HSIOM);
-	Cy_GPIO_Pin_FastInit(UART_tx_PORT, UART_tx_NUM, CY_GPIO_DM_STRONG_IN_OFF, 1, TX_HSIOM);
+    Cy_GPIO_Pin_FastInit(RX_IN_PORT, RX_IN_NUM, CY_GPIO_DM_HIGHZ, 1, RX_HSIOM);
+	Cy_GPIO_Pin_FastInit(TX_OUT_PORT, TX_OUT_NUM, CY_GPIO_DM_STRONG_IN_OFF, 1, TX_HSIOM);
 }
 
 /*******************************************************************************
@@ -213,20 +220,30 @@ int main(void)
 	coreStatus = LoRaWAN_Init(&coreConfig);
 
 	/* Check Onethinx Core info */
-	LoRaWAN_GetInfo(&coreInfo);
+	coreStatus = LoRaWAN_GetInfo(&coreInfo);
 
-    uint8_t devAddress[] = {0x00, 0xA0u, 0x50, 0x00, 0x01, 0x5A};
+    uint8_t devAddress[] = {0x00, 0xA0u, 0x50, 0x00, coreInfo.devEUI[6], coreInfo.devEUI[7]};
 	/* Initialize BLE */
     Ble_Init((uint8_t *) &devAddress);
+	LoRaStatus = lorawan_idle;
    
     for( ; ; ) {
         /* Allow BLE stack to process pending events */
         if (Ble_ProcessEvents()) break;
-        
+
+		coreStatus = LoRaWAN_GetStatus();
+
         /* Send notification at button press */
 		if (Cy_GPIO_Read(BUTTON_PORT, BUTTON_NUM))
 		{
-			if (++btcnt == 10) Ble_SendNotification();
+			if (++btcnt == 10) {
+				buffer.data[0] = 40;			/// <param name="tone">Semitone offset from C4 (0⇒C4, 12⇒C5, etc.).</param>
+				buffer.data[1] = 50;			/// <param name="time">Duration in 10 ms units (e.g., 30 ⇒ 300 ms).</param>
+				buffer.length = 2;
+				buffer.command = host_beep;
+				Ble_SendNotification();
+				buffer.command = cmd_idle;
+			}
 		}
 		else btcnt = 0;
 
@@ -240,12 +257,93 @@ int main(void)
         if (RXtimeout && RXtimeout-- == 1)
         {
             buffer.length = RXcnt;
+			buffer.command = host_message;
             Ble_SendNotification();
+			buffer.command = cmd_idle;
             RXcnt = 0;
         }
 
+		if (buffer.command != cmd_idle)
+		{
+			switch (buffer.command)
+			{
+				case dev_uart_send:
+				{
+					uint8_t cnt = 0;
+					DEBUG_BLE("'%.*s' (", buffer.length, buffer.data);
+					for (; cnt < buffer.length - 1; cnt ++) DEBUG_BLE("%2X-", buffer.data[cnt]);
+					DEBUG_BLE("%2X)\n", buffer.data[cnt]);
+				}
+				break;
+				case dev_lorawan_join:
+					if (coreStatus.system.isBusy)
+					{
+						buffer.command = host_error;
+						buffer.length = sprintf((char *) &buffer.data, "Error: LoRa radio busy!");
+					}
+					else
+					{
+						coreStatus = LoRaWAN_Join(M4_NoWait);
+						LoRaStatus = lorawan_join;
+						buffer.command = host_message;
+						buffer.length = sprintf((char *) &buffer.data, "Joining...");
+					}
+					Ble_SendNotification();
+				break;
+				case dev_lorawan_send:
+					if (coreStatus.system.isBusy)
+					{
+						buffer.command = host_error;
+						buffer.length = sprintf((char *) &buffer.data, "Error: LoRa radio busy!");
+					}
+					else if (!coreStatus.mac.isJoined)
+					{
+						buffer.command = host_error;
+						buffer.length = sprintf((char *) &buffer.data, "Error: Not Joined!");
+					}
+					else
+					{
+						coreStatus = LoRaWAN_Send((uint8_t *) buffer.data, buffer.length, M4_NoWait);
+						LoRaStatus = lorawan_send;
+						buffer.command = host_message;
+						buffer.length = sprintf((char *) &buffer.data, "Sending...");
+					}
+					Ble_SendNotification();
+				break;
+			}
+			buffer.command = cmd_idle;
+		}
+
+
+		if (LoRaStatus != lorawan_idle && !coreStatus.system.isBusy)
+		{
+			uint32_t loraError = LoRaWAN_GetError().errorValue;
+			if (loraError == errorStatus_NoError)
+			{
+				buffer.command = host_message;
+				buffer.length = sprintf((char *) &buffer.data, "Finished OK!");
+				Ble_SendNotification();
+			}
+			else
+			{
+				buffer.command = host_error;
+				buffer.length = sprintf((char *) &buffer.data, "Error: %8X", loraError);
+				Ble_SendNotification();
+			}
+			buffer.command = cmd_idle;
+			LoRaStatus = lorawan_idle;
+		}
+
         /* Update Leds once in a while */
-        if ((++LEDdelay & 16383) == 1) UpdateLedState();
+        if ((++LEDdelay & 0x1FFF) == 1) 
+		{
+			if (coreStatus.system.isBusy) {
+				Cy_GPIO_Inv(LED_B_PORT, LED_B_NUM);
+				Cy_GPIO_Write(LED_R_PORT, LED_R_NUM, Cy_GPIO_ReadOut(LED_B_PORT, LED_B_NUM) == 0);
+			}
+			else
+				UpdateLedState();
+		}	
     }
 
 	/* send join using parameters in coreConfig, blocks until either success or MAXtries */	coreStatus = LoRaWAN_Join(M4_NoWait);

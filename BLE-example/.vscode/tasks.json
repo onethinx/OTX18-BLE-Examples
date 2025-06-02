@@ -5,14 +5,36 @@
         "label": "OTX Maestro",
         "command": "${command:otx-maestro.showInfo}",
         "options": {
-            "statusbar": { 
-                "label": "$(zap)OTX-Maestro$(zap)",
+            "sidebar": { 
+                "label": "OTX-Maestro",
                 "color": "#25C0D8",
-                "alignment": "left",
-                "priority": 0,
                 "detail": "OTX-Maestro v${thisVersion}\n\n[Learn More](https://github.com/onethinx/OTX-Maestro/blob/main/README.md)"
-            },
-        },
+            }
+        }
+    },
+    {
+        "label": "Configure Provisioning",
+        "command": "${command:otx-maestro.configureProvisioning}",
+        "options": {
+            "sidebar": { 
+                "label": "Configure Provisioning",
+                "hide" : false,
+                "spacer": true,
+                "color" : "#108080",
+                "detail": "Configure ChirpStack Provisioning",
+            }
+        }
+    },
+    {
+        "label": "Provision Keys",
+        "command": "${command:otx-maestro.doProvisioning}",
+        "options": {
+            "sidebar": { 
+                "label": "Provision Keys",
+                "hide" : false,
+                "color" : "#108080"
+            }
+        }
     },
     {
         "label": "JLink Power Off",
@@ -25,6 +47,11 @@
                 "alignment": "right",
                 "priority": 500
             },
+            "sidebar": { 
+                "label": "JLink Power Off",
+                "hide" : "${notJlink}",
+                "spacer": true,
+            }
         },
     },
     {
@@ -39,6 +66,11 @@
                 "alignment": "right",
                 "priority": 500
             },
+            "sidebar": { 
+                "label": "JLink Power On",
+                "hide" : "${notJlink}",
+                "color": "#108010"
+            }
         }
     },
     {
@@ -64,6 +96,10 @@
                 "alignment": "right",
                 "priority": 500
             },
+            "sidebar": { 
+                "label": "Update Project",
+                "spacer": true,
+            }
         }
     },
     {
@@ -76,6 +112,9 @@
                 "alignment": "right",
                 "priority": 500
             },
+            "sidebar": { 
+                "label": "Select Programmer",
+            }
         }
     },
     {
@@ -88,6 +127,11 @@
                 "alignment": "right",
                 "priority": 500
             },
+            "sidebar": { 
+                "label": "Clean Reconfigure",
+                "spacer": true,
+                "color": "#804000"
+            }
         }
     },
     {
@@ -100,6 +144,10 @@
                 "alignment": "right",
                 "priority": 500
             },
+            "sidebar": { 
+                "label": "Build",
+                "color": "#804000"
+            }
         }
     },
     {
@@ -113,8 +161,12 @@
                 "alignment": "right",
                 "priority": 500
             },
+            "sidebar": { 
+                "label": "Build-and-Launch",
+                "color": "#804000"
+            }
         },
-    }, 
+    },
     {
         "label": "OTX: configure",
         "type": "shell",

@@ -110,5 +110,22 @@
                 "-gdb-exit"
             ],
         },
+        {
+            "name": "Check",
+            "type": "cortex-gdb",
+            "request": "launch",
+            "cwd": "${workspaceRoot}",
+            "executable": "${workspaceRoot}/build/${workspaceFolderBasename}.elf",
+            "servertype": "openocd",
+            "serverpath": "${env:ONETHINX_PACK_LOC}/openocd/bin/openocd",
+            "searchDir": [ "${env:ONETHINX_PACK_LOC}/openocd/scripts" ],
+            "configFiles": [
+                ".vscode/brd.cfg"
+            ],
+            "overrideLaunchCommands": [
+                "-gdb-exit"
+            ],
+            "showServerOutput": "switch",
+        },
     ]
 }

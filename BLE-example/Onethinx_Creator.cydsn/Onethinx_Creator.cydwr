@@ -11,12 +11,14 @@
       <Data key="dbfbb3fc-f55c-491e-aa8f-6fe3ca2d63d0" value="Clock_1" />
     </Group>
     <Group key="Pin">
+      <Data key="1b73250a-6222-4203-809a-716f5f697827" value="RX_IN" />
       <Data key="2a29514f-6353-4d7b-87f5-f123d4e768dc" value="UART_TX" />
       <Data key="2e2b4925-959b-4562-817a-bae0f4f50ea1/65f3af6c-759b-4ccb-8c66-5c95ba1f5f4f" value="UART_tx" />
       <Data key="2e2b4925-959b-4562-817a-bae0f4f50ea1/b7e8018e-1ef7-49c0-b5a5-61641a03e31c" value="UART_rx" />
       <Data key="4cca878b-77b5-471d-8aeb-ad6925202455" value="BUTTON" />
       <Data key="a61270bc-07ec-447d-ac9e-34cfe85c30e9" value="LED_R" />
       <Data key="ac2c76e1-903c-4312-99e1-895520005574" value="UART_RX" />
+      <Data key="d0767903-e2b9-4143-87e9-72ada200ae9f" value="TX_OUT" />
       <Data key="f43651a0-fb2f-40bf-9566-fa65fbb8ff22" value="LED_B" />
     </Group>
   </Group>
@@ -676,6 +678,11 @@
     </Group>
   </Group>
   <Group key="Pin2">
+    <Group key="1b73250a-6222-4203-809a-716f5f697827">
+      <Group key="0">
+        <Data key="Port Format" value="9,0" />
+      </Group>
+    </Group>
     <Group key="2a29514f-6353-4d7b-87f5-f123d4e768dc">
       <Group key="0">
         <Data key="Port Format" value="10,1" />
@@ -704,6 +711,11 @@
     <Group key="ac2c76e1-903c-4312-99e1-895520005574">
       <Group key="0">
         <Data key="Port Format" value="10,0" />
+      </Group>
+    </Group>
+    <Group key="d0767903-e2b9-4143-87e9-72ada200ae9f">
+      <Group key="0">
+        <Data key="Port Format" value="9,1" />
       </Group>
     </Group>
     <Group key="f43651a0-fb2f-40bf-9566-fa65fbb8ff22">

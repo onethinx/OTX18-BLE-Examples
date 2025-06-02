@@ -29,9 +29,9 @@ static const cy_stc_ble_diss_t cy_ble_diss =
         0x0014u, /* Handle of the Hardware Revision String characteristic */ 
         0x0016u, /* Handle of the Firmware Revision String characteristic */ 
         0x0018u, /* Handle of the Software Revision String characteristic */ 
-        0x001Au, /* Handle of the System ID characteristic */ 
-        0x001Cu, /* Handle of the IEEE 11073-20601 Regulatory Certification Data List characteristic */ 
-        0x001Eu, /* Handle of the PnP ID characteristic */ 
+        CY_BLE_GATT_INVALID_ATTR_HANDLE_VALUE, /* Handle of the System ID characteristic */ 
+        CY_BLE_GATT_INVALID_ATTR_HANDLE_VALUE, /* Handle of the IEEE 11073-20601 Regulatory Certification Data List characteristic */ 
+        CY_BLE_GATT_INVALID_ATTR_HANDLE_VALUE, /* Handle of the PnP ID characteristic */ 
     },
 };
 #endif /* CY_BLE_DIS_SERVER */

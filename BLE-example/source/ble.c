@@ -1,16 +1,10 @@
-#include <string.h>
 #include "project.h"
 #include "ble.h"
-#include "stdio.h"
 
 /* Reference to buffer defined on main.c */
 extern BLEbuffer buffer;
 
-#ifdef DEBUG
-#define DEBUG_BLE(...) printf(__VA_ARGS__)
-#else
-#define DEBUG_BLE(...)
-#endif
+
 
 cy_stc_ble_gatts_handle_value_ntf_t notificationPacket;
 cy_en_ble_api_result_t apiResult;
@@ -46,7 +40,10 @@ void Ble_Init(uint8_t * devAddress)
         DEBUG_BLE("BLE Stack Initialized...\n");
     }
 
-    *cy_ble_config.deviceAddress = (cy_stc_ble_gap_bd_addr_t) {{devAddress[5], devAddress[4], devAddress[3], devAddress[2], devAddress[1], devAddress[0]}, 0x00u };
+    *cy_ble_config.deviceAddress = (cy_stc_ble_gap_bd_addr_t) {
+        .bdAddr = { devAddress[5], devAddress[4], devAddress[3], devAddress[2], devAddress[1], devAddress[0] }, 
+        .type = 0x00u     // public = 0
+    };
     
     apiResult = Cy_BLE_GetStackLibraryVersion(&stackVersion);
     
@@ -294,12 +291,12 @@ void StackEventHandler(uint32 event, void* eventParam)
                 uint8_t cnt;
                 uint8_t * data = ((cy_stc_ble_gatts_write_cmd_req_param_t *)eventParam)->handleValPair.value.val;
                 uint8_t length = ((cy_stc_ble_gatts_write_cmd_req_param_t *)eventParam)->handleValPair.value.len;
-                DEBUG_BLE("R: GATT WriteWithoutResponse: '%.*s' (", length, data);
-                for (cnt = 0; cnt < length - 1; cnt ++) DEBUG_BLE("%2X-", data[cnt]);
-                DEBUG_BLE("%2X)\n", buffer.data[cnt]);
+                DEBUG_BLE("R: GATT WriteWithoutResponse: %d bytes\n", length);
+                //for (cnt = 0; cnt < length - 1; cnt ++) DEBUG_BLE("%2X-", data[cnt]);
+                //DEBUG_BLE("%2X)\n", data[cnt]);
                 /* Copy received data to buffer */
-                for (cnt = 0; cnt < length; cnt++) buffer.data[cnt] = data[cnt];
-                buffer.length = length;
+                for (cnt = 0; cnt < length; cnt++) buffer.rawbytes[cnt] = data[cnt];
+                buffer.length = length - 1;     // minus one command byte
             }
             break;
         }
@@ -373,16 +370,16 @@ bool Ble_ProcessEvents(void)
 void Ble_SendNotification(void)
 {
     /* Update the notification packet handle */
-    notificationPacket.handleValPair.value.val = buffer.data;
-    notificationPacket.handleValPair.value.len = buffer.length;
+    notificationPacket.handleValPair.value.val = buffer.rawbytes;
+    notificationPacket.handleValPair.value.len = buffer.length + 1; // include command byte
 
     apiResult = Cy_BLE_GATTS_SendNotification(&notificationPacket.connHandle, &notificationPacket.handleValPair);
     if (apiResult == CY_BLE_SUCCESS)
     {
         uint8_t cnt;
-        DEBUG_BLE("S: Notification sent: '%.*s' (", buffer.length, buffer.data);
-        for (cnt = 0; cnt < buffer.length - 1; cnt ++) DEBUG_BLE("%2X-", buffer.data[cnt]);
-         DEBUG_BLE("%2X)\n", buffer.data[cnt]);
+        DEBUG_BLE("S: Notification sent: '%.*s' (", buffer.length + 1, buffer.rawbytes);
+        for (cnt = 0; cnt < buffer.length; cnt ++) DEBUG_BLE("%2X-", buffer.rawbytes[cnt]);
+        DEBUG_BLE("%2X)\n", buffer.rawbytes[cnt]);
     }
     else
         DEBUG_BLE("GATTS Send Notification API Error: 0x%2.2x, Attrhandle: 0x%4X\n", apiResult, notificationPacket.handleValPair.attrHandle);

@@ -279,7 +279,7 @@ extern "C" {
 
 /** The GATT Maximum attribute length. */
 #define CY_BLE_CONFIG_GATT_DB_MAX_VALUE_LEN         (0x00F4u)
-#define CY_BLE_GATT_DB_INDEX_COUNT                  (0x0024u)
+#define CY_BLE_GATT_DB_INDEX_COUNT                  (0x001Eu)
 
 /** The number of characteristics supporting the Reliable Write property. */
 #define CY_BLE_CONFIG_GATT_RELIABLE_CHAR_COUNT      (0x0000u)
@@ -310,7 +310,7 @@ extern "C" {
     #define CY_BLE_CONFIG_L2CAP_PSM_COUNT               (1u)
 #endif  /* CY_BLE_L2CAP_ENABLE != 0u */
 
-#define CY_BLE_CONFIG_GATT_DB_ATT_VAL_COUNT         (0x14u)
+#define CY_BLE_CONFIG_GATT_DB_ATT_VAL_COUNT         (0x11u)
 
 /** Max Tx payload size. */
 #define CY_BLE_CONFIG_LL_MAX_TX_PAYLOAD_SIZE        (0xFBu)
@@ -387,12 +387,12 @@ extern "C" {
 #define CY_BLE_DATA_INOUT_DATA_IN_CHAR_INDEX   (0x01u) /* Index of Data In characteristic */
 
 
-#define CY_BLE_DATA_INOUT_SERVICE_HANDLE   (0x001Fu) /* Handle of Data InOut service */
-#define CY_BLE_DATA_INOUT_DATA_OUT_DECL_HANDLE   (0x0020u) /* Handle of Data Out characteristic declaration */
-#define CY_BLE_DATA_INOUT_DATA_OUT_CHAR_HANDLE   (0x0021u) /* Handle of Data Out characteristic */
-#define CY_BLE_DATA_INOUT_DATA_OUT_CLIENT_CHARACTERISTIC_CONFIGURATION_DESC_HANDLE   (0x0022u) /* Handle of Client Characteristic Configuration descriptor */
-#define CY_BLE_DATA_INOUT_DATA_IN_DECL_HANDLE   (0x0023u) /* Handle of Data In characteristic declaration */
-#define CY_BLE_DATA_INOUT_DATA_IN_CHAR_HANDLE   (0x0024u) /* Handle of Data In characteristic */
+#define CY_BLE_DATA_INOUT_SERVICE_HANDLE   (0x0019u) /* Handle of Data InOut service */
+#define CY_BLE_DATA_INOUT_DATA_OUT_DECL_HANDLE   (0x001Au) /* Handle of Data Out characteristic declaration */
+#define CY_BLE_DATA_INOUT_DATA_OUT_CHAR_HANDLE   (0x001Bu) /* Handle of Data Out characteristic */
+#define CY_BLE_DATA_INOUT_DATA_OUT_CLIENT_CHARACTERISTIC_CONFIGURATION_DESC_HANDLE   (0x001Cu) /* Handle of Client Characteristic Configuration descriptor */
+#define CY_BLE_DATA_INOUT_DATA_IN_DECL_HANDLE   (0x001Du) /* Handle of Data In characteristic declaration */
+#define CY_BLE_DATA_INOUT_DATA_IN_CHAR_HANDLE   (0x001Eu) /* Handle of Data In characteristic */
 
 
 

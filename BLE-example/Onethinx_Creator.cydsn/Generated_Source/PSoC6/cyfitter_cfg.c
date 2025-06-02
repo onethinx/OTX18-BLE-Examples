@@ -306,7 +306,7 @@ void Cy_SystemInit(void)
 	        .out        = 0x00000003u,
 	        .intrMask   = 0x00000000u,
 	        .intrCfg    = 0x00000000u,
-	        .cfg        = 0x00000068u,
+	        .cfg        = 0x0000006Au,
 	        .cfgIn      = 0x00000000u,
 	        .cfgOut     = 0x00000000u,
 	        .cfgSIO     = 0x00000000u,

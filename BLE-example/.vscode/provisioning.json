@@ -1,0 +1,11 @@
+{
+  "client": "chirpstack",
+  "chirpStackConfig": {
+    "protocol": "grpc",
+    "url": "network.onethinx.com:8080",
+    "tenantId": "52f14cd4-c6f1-4fbd-8f87-4025e1d49242",
+    "applicationId": "4a1521f1-d057-42ba-ac7b-87fa0f73560c",
+    "deviceProfileId": "d8403302-efef-44de-828a-14cea3c078c0",
+    "encryptedApiKey": "7BJbO1Nia00o2SmAp+DAqQ==:wl5/AhbHvUbPW0CmbUrXQqTCgM7OcY/UHpeuOVGV4UWL6EthAWzZn7P46ODi/HBQ33XE7lTUFchBzUjAvZaGcRLq7uu1FC05kL/L/GR8MfZ4R6HoYPQ3jdHKdaldRGaKwrOpfBfqcZUyjN6DdlKhUbXEGIXRDSEw4NwCZaZxZTYDbYCyvmWTWKbiQvg44LwQkxpF1QlFgb/38LUw199eF9HS9/NLfqVGDGIAY9IYe8SM8zVRw0BtQC+hWyvgVp/anmPsB3aXNycxnPV284SjHb70qMYVjl5d15dcwS+eL6E="
+  }
+}

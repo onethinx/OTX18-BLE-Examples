@@ -27,22 +27,22 @@ static const cy_stc_ble_customs_t cy_ble_customs[0x01u] = {
 
     /* Data InOut service */
     {
-        0x001Fu, /* Handle of the Data InOut service */ 
+        0x0019u, /* Handle of the Data InOut service */ 
         {
 
             /* Data Out characteristic */
             {
-                0x0021u, /* Handle of the Data Out characteristic */ 
+                0x001Bu, /* Handle of the Data Out characteristic */ 
                 
                 /* Array of Descriptors handles */
                 {
-                    0x0022u, /* Handle of the Client Characteristic Configuration descriptor */ 
+                    0x001Cu, /* Handle of the Client Characteristic Configuration descriptor */ 
                 }, 
             },
 
             /* Data In characteristic */
             {
-                0x0024u, /* Handle of the Data In characteristic */ 
+                0x001Eu, /* Handle of the Data In characteristic */ 
                 
                 /* Array of Descriptors handles */
                 {
