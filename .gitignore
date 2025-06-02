@@ -3,8 +3,7 @@
 **/Onethinx_Creator.cydsn/CortexM4/**
 **/Onethinx_Creator.cydsn/Onethinx_Creator.cyprj.*
 **/Onethinx_Creator.cydsn/Onethinx_Creator.cywrk.*
-.DS_Store
-.cache/**
+**/.DS_Store
 **/build/backup/**
 **/build/meson-info/**
 **/build/meson-logs/**
